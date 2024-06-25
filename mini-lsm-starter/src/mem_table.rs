@@ -82,11 +82,9 @@ impl MemTable {
     /// In week 1, day 1, simply put the key-value pair into the skipmap.
     /// In week 2, day 6, also flush the data to WAL.
     pub fn put(&self, _key: &[u8], _value: &[u8]) -> Result<()> {
-        //TODO - this method is not thread-safe
         self.map
             .insert(Bytes::copy_from_slice(_key), Bytes::copy_from_slice(_value));
-        let value = self.approximate_size.load(Ordering::SeqCst);
-        self.approximate_size.store(value + 1, Ordering::SeqCst);
+        self.approximate_size.fetch_add(1, Ordering::SeqCst);
         return Ok(());
     }
 
