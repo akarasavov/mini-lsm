@@ -8,8 +8,8 @@ use std::sync::Arc;
 
 use anyhow::Result;
 use bytes::Bytes;
-use parking_lot::{Mutex, MutexGuard, RawRwLock, RwLock};
 use parking_lot::lock_api::RwLockReadGuard;
+use parking_lot::{Mutex, MutexGuard, RawRwLock, RwLock};
 
 use crate::block::Block;
 use crate::compact::{
@@ -293,7 +293,7 @@ impl LsmStorageInner {
             }
         }
 
-        return Ok(None);
+        Ok(None)
     }
 
     /// Write a batch of data into the storage. Implement in week 2 day 7.
@@ -307,7 +307,7 @@ impl LsmStorageInner {
         let result = guard.memtable.put(_key, _value);
 
         self.try_to_freeze(guard);
-        return result;
+        result
     }
 
     fn try_to_freeze(&self, guard: RwLockReadGuard<RawRwLock, Arc<LsmStorageState>>) {
@@ -323,7 +323,7 @@ impl LsmStorageInner {
     fn is_memtable_limit_reached(&self) -> bool {
         let limit = self.options.target_sst_size;
         let approximate_size = self.state.read().memtable.approximate_size();
-        return approximate_size >= limit;
+        approximate_size >= limit
     }
 
     /// Remove a key from the storage by writing an empty value.
@@ -331,7 +331,7 @@ impl LsmStorageInner {
         let guard = self.state.read();
         let result = guard.memtable.put(_key, b"");
         self.try_to_freeze(guard);
-        return result;
+        result
     }
 
     pub(crate) fn path_of_sst_static(path: impl AsRef<Path>, id: usize) -> PathBuf {
@@ -363,7 +363,7 @@ impl LsmStorageInner {
         state.imm_memtables.insert(0, state.memtable.clone());
         state.memtable = new_memtable;
         *guard = Arc::new(state);
-        return Ok(());
+        Ok(())
     }
 
     /// Force flush the earliest-created immutable memtable to disk
