@@ -105,7 +105,7 @@ impl MemTable {
             iter_builder: |map| map.range((lower, upper)),
             item: (Bytes::new(), Bytes::new()),
         }
-            .build();
+        .build();
         iter.next().unwrap();
         iter
     }
@@ -165,7 +165,7 @@ impl StorageIterator for MemTableIterator {
     }
 
     fn key(&self) -> KeySlice {
-        return KeySlice::from_slice(&self.borrow_item().0[..])
+        return KeySlice::from_slice(&self.borrow_item().0[..]);
     }
 
     fn is_valid(&self) -> bool {

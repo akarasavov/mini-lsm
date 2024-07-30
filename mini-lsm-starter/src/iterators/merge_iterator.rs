@@ -48,7 +48,10 @@ pub struct MergeIterator<I: StorageIterator> {
 impl<I: StorageIterator> MergeIterator<I> {
     pub fn create(iters: Vec<Box<I>>) -> Self {
         if iters.is_empty() {
-            return MergeIterator { iters: BinaryHeap::new(), current: None };
+            return MergeIterator {
+                iters: BinaryHeap::new(),
+                current: None,
+            };
         }
         let mut binary_heap = BinaryHeap::new();
         for (idx, iter) in iters.into_iter().enumerate() {
@@ -57,12 +60,15 @@ impl<I: StorageIterator> MergeIterator<I> {
             }
         }
         let current = binary_heap.pop().unwrap();
-        return MergeIterator { iters: binary_heap, current: Some(current) };
+        return MergeIterator {
+            iters: binary_heap,
+            current: Some(current),
+        };
     }
 }
 
-impl<I: 'static + for<'a> StorageIterator<KeyType<'a>=KeySlice<'a>>> StorageIterator
-for MergeIterator<I>
+impl<I: 'static + for<'a> StorageIterator<KeyType<'a> = KeySlice<'a>>> StorageIterator
+    for MergeIterator<I>
 {
     type KeyType<'a> = KeySlice<'a>;
 

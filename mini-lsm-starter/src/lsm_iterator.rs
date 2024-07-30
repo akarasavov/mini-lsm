@@ -17,7 +17,24 @@ pub struct LsmIterator {
 
 impl LsmIterator {
     pub(crate) fn new(iter: LsmIteratorInner) -> Result<Self> {
-        Ok(Self { inner: iter })
+        let mut local_iter = Self { inner: iter };
+        local_iter.move_to_non_delete()?;
+        Ok(local_iter)
+    }
+
+    fn next_inner(&mut self) -> Result<()> {
+        self.inner.next()?;
+        if !self.inner.is_valid() {
+            return Ok(());
+        }
+        return Ok(());
+    }
+
+    fn move_to_non_delete(&mut self) -> Result<()> {
+        while self.inner.is_valid() && self.inner.value().is_empty() {
+            self.next_inner()?;
+        }
+        Ok(())
     }
 }
 
@@ -25,19 +42,21 @@ impl StorageIterator for LsmIterator {
     type KeyType<'a> = &'a [u8];
 
     fn is_valid(&self) -> bool {
-        unimplemented!()
+        self.inner.is_valid()
     }
 
     fn key(&self) -> &[u8] {
-        unimplemented!()
+        self.inner.key().raw_ref()
     }
 
     fn value(&self) -> &[u8] {
-        unimplemented!()
+        self.inner.value()
     }
 
     fn next(&mut self) -> Result<()> {
-        unimplemented!()
+        self.next_inner()?;
+        self.move_to_non_delete()?;
+        Ok(())
     }
 }
 
@@ -59,7 +78,9 @@ impl<I: StorageIterator> FusedIterator<I> {
 }
 
 impl<I: StorageIterator> StorageIterator for FusedIterator<I> {
-    type KeyType<'a> = I::KeyType<'a> where Self: 'a;
+    type KeyType<'a> = I::KeyType<'a>
+    where
+        Self: 'a;
 
     fn is_valid(&self) -> bool {
         !self.has_errored && self.iter.is_valid()
