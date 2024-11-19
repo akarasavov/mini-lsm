@@ -1,8 +1,8 @@
 #![allow(unused_variables)] // TODO(you): remove this lint after implementing this mod
 #![allow(dead_code)] // TODO(you): remove this lint after implementing this mod
 
-use bytes::BufMut;
 use crate::key::{KeySlice, KeyVec};
+use bytes::BufMut;
 
 use super::{Block, SIZEOF_U16};
 
@@ -21,13 +21,20 @@ pub struct BlockBuilder {
 impl BlockBuilder {
     /// Creates a new block builder.
     pub fn new(block_size: usize) -> Self {
-        Self { offsets: vec![], data: vec![], block_size, first_key: KeyVec::new() }
+        Self {
+            offsets: vec![],
+            data: vec![],
+            block_size,
+            first_key: KeyVec::new(),
+        }
     }
 
     /// Adds a key-value pair to the block. Returns false when the block is full.
     #[must_use]
     pub fn add(&mut self, key: KeySlice, value: &[u8]) -> bool {
-        if self.estimate_current_size() + key.len() + value.len() + 3 * SIZEOF_U16 > self.block_size && !self.first_key.is_empty() {
+        if self.estimate_current_size() + key.len() + value.len() + 3 * SIZEOF_U16 > self.block_size
+            && !self.first_key.is_empty()
+        {
             return false;
         }
         self.offsets.push(self.data.len() as u16);
@@ -52,6 +59,9 @@ impl BlockBuilder {
 
     /// Finalize the block.
     pub fn build(self) -> Block {
-        return Block { data: self.data, offsets: self.offsets };
+        return Block {
+            data: self.data,
+            offsets: self.offsets,
+        };
     }
 }

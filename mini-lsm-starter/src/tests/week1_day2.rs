@@ -283,7 +283,7 @@ fn test_task4_integration() {
         .force_freeze_memtable(&storage.state_lock.lock())
         .unwrap();
     storage.put(b"1", b"233333").unwrap();
-    storage.put(b"3", b"23").unwrap();
+    storage.put(b"3", b"233333").unwrap();
     {
         let mut iter = storage.scan(Bound::Unbounded, Bound::Unbounded).unwrap();
         check_lsm_iter_result_by_key(

@@ -33,8 +33,14 @@ impl Block {
         let number_of_elements = (&data[data.len() - SIZEOF_U16..]).get_u16() as usize;
         let data_end = data.len() - SIZEOF_U16 - number_of_elements * SIZEOF_U16;
         let offset_block = &data[data_end..data.len() - SIZEOF_U16];
-        let offsets = offset_block.chunks(SIZEOF_U16).map(|mut elem| elem.get_u16()).collect();
+        let offsets = offset_block
+            .chunks(SIZEOF_U16)
+            .map(|mut elem| elem.get_u16())
+            .collect();
         let data_block = data[0..data_end].to_vec();
-        return Self { data: data_block, offsets };
+        return Self {
+            data: data_block,
+            offsets,
+        };
     }
 }
